@@ -6,11 +6,16 @@ import MuseUI from 'muse-ui'
 import theme from 'muse-ui/lib/theme'
 import 'muse-ui/dist/muse-ui.css'
 import { rtdbPlugin } from 'vuefire'
+import VueCookies from 'vue-cookies'
 
 theme.use('dark')
 
 Vue.use(rtdbPlugin)
 Vue.use(MuseUI)
+Vue.use(VueCookies)
+
+// set default config
+Vue.$cookies.config('7d')
 
 Vue.config.productionTip = false
 

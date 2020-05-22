@@ -2,16 +2,19 @@
   <mu-container id="app">
     <h1>Dunge♂n Chat Room</h1>
     <ChatBox />
+    <SoundButtons />
   </mu-container>
 </template>
 
 <script>
 import ChatBox from './components/ChatBox'
+import SoundButtons from './components/SoundButtons'
 
 export default {
   name: 'App',
   components: {
-    ChatBox
+    ChatBox,
+    SoundButtons
   }
 }
 </script>
@@ -23,5 +26,7 @@ h1 {
 #app{
   position: relative;
   background: #424242;
+  height: 80vh;
+  max-height: 80vh;
 }
 </style>
