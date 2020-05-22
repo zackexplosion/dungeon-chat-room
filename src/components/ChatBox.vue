@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div class="container">
+
+    <h4 v-if="reversedMessage.length <= 0">
+      loading slaves
+    </h4>
     <ul id="messages">
       <li v-for="(m, index) in reversedMessage" :key="index">
         {{ m.from }} : {{ m.message }}
@@ -13,8 +17,9 @@
       <mu-divider></mu-divider>
       <span>{{ slaveName }}</span>
       <mu-text-field
-      v-model="inputMessage"
-      class="inputbox"
+        v-model="inputMessage"
+        ref="inputbox"
+        class="inputbox"
       />
       <mu-button @click="sendMessage">Send</mu-button>
     </form>
@@ -50,7 +55,6 @@ export default {
     }
   },
   async created () {
-    console.log('created')
     db.ref('messages').once('value', initMessages => {
       if (!initMessages.val()) return
       const messages = initMessages.val()
@@ -78,14 +82,10 @@ export default {
 
         slaveName = 'slave#' + slaves
         this.$cookies.set('slaveName', slaveName)
-        if (!slaves) db.ref('slaves').set(slaves + 1)
+        db.ref('slaves').set(slaves + 1)
       }
 
       this.slaveName = slaveName
-
-      // if (!slaves) db.ref('slaves').set(1)
-
-      // var slave_name = ''
     } catch (error) {
       console.error(error)
     }
@@ -101,6 +101,12 @@ export default {
         return false
       }
     }
+  },
+  mounted () {
+    this.$nextTick(() => {
+      var el = this.$refs.inputbox.$el
+      el.querySelector('input').focus()
+    })
   },
   watch: {
     messages (n, o) {
@@ -120,9 +126,10 @@ export default {
 </style>
 <style lang="scss" scoped>
 
-.container {
-  height: 100%;
-}
+// .container {
+//   height: calc(80vh -100px);
+
+// }
 
 .inputbox{
   width: calc(100% - 160px);
@@ -130,10 +137,13 @@ export default {
 
 $inputBarHeight: 48;
 .inputbar {
+  padding-left: 15px;
   width: 100%;
-  position: absolute;
+  position: fixed;
   bottom: 0;
+  left: 0;
   height: $inputBarHeight + px;
+  background-color: #424242;
 }
 
 </style>

@@ -3,7 +3,7 @@
     ".read": true,
     ".write": true,
     "messages": {
-      "createdAt": ".index"
+      ".indexOn": ["createdAt"]
     }
   }
 }

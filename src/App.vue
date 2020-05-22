@@ -1,8 +1,14 @@
 <template>
   <mu-container id="app">
     <h1>Dunge♂n Chat Room</h1>
-    <ChatBox />
-    <SoundButtons />
+    <mu-row>
+      <mu-col span="8">
+        <ChatBox />
+      </mu-col>
+      <mu-col span="4">
+        <SoundButtons />
+      </mu-col>
+    </mu-row>
   </mu-container>
 </template>
 
