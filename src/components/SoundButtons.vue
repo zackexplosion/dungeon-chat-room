@@ -4,40 +4,16 @@
       v-for="(b, index) in buttons"
       :key="index"
       small
-      @click="send(b)"
+      @click="send(b, index)"
     > {{ index }}
     </mu-button>
   </mu-container>
 </template>
 
 <script>
-// var buttons = []
-// var SOUNDS = [
-//   'WOO.mp3'
-// ]
-
-// SOUNDS.forEach(f => {
-//   buttons.push({
-//     raw: require(`@/assets/gachi/${f}`),
-//     name: f.split('.')[0]
-//   })
-// })
-
-var buttons = {
-  // 'woo': require(`@/assets/gachi/woo.mp3`),
-  // 'Suction': require(`@/assets/gachi/Suction.mp3`),
-  // 'Thank you sir': require(`@/assets/gachi/Thank you sir.mp3`)
-}
-
-var req = require.context('@/assets/gachi/')
-req.keys().forEach(function (key) {
-  // console.log(key)
-  var regexp = /\.\/(.*)\.mp3/
-  var m = key.match(regexp)
-  var _key = m[1]
-  // console.log(_key)
-  buttons[_key.trim()] = require('@/assets/gachi/' + _key + '.mp3')
-})
+import { db } from '@/db'
+import firebase from 'firebase/app'
+import buttons from '@/sounds'
 
 export default {
   data () {
@@ -46,9 +22,17 @@ export default {
     }
   },
   methods: {
-    send (a) {
-      new Audio(a).play()
-      this.$emit('sendSound', b)
+    send (aduio, key) {
+      new Audio(aduio).play()
+
+      db.ref('messages').push({
+        from: this.$cookies.get('slaveName'),
+        message: {
+          type: 'audio',
+          key: key
+        },
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      })
     }
   }
 }

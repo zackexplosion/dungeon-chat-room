@@ -6,18 +6,29 @@
         <ChatBox />
       </mu-col>
       <mu-col span="4">
-        <SoundButtons />
+        <SoundButtons/>
       </mu-col>
     </mu-row>
   </mu-container>
 </template>
 
 <script>
+import { db } from '@/db'
 import ChatBox from './components/ChatBox'
 import SoundButtons from './components/SoundButtons'
 
 export default {
   name: 'App',
+  async created () {
+    var slaveName = this.$cookies.get('slaveName')
+    if (!slaveName) {
+      const slaves = (await db.ref('slaves').once('value')).val()
+
+      slaveName = 'slave#' + slaves
+      this.$cookies.set('slaveName', slaveName)
+      db.ref('slaves').set(slaves + 1)
+    }
+  },
   components: {
     ChatBox,
     SoundButtons

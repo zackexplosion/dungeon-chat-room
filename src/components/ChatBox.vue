@@ -6,7 +6,18 @@
     </h4>
     <ul id="messages">
       <li v-for="(m, index) in reversedMessage" :key="index">
-        {{ m.from }} : {{ m.message }}
+        <template v-if="m.message.type == 'audio'">
+        {{ m.from }} :
+          <mu-button
+          @click="playMessageSound(m.message.key)"
+          >
+            {{ m.message.key}}
+            <mu-icon value="check_circle" right></mu-icon>
+          </mu-button>
+        </template>
+        <template v-else>
+          {{ m.from }} : {{ m.message }}
+        </template>
       </li>
     </ul>
 
@@ -29,8 +40,7 @@
 <script>
 import { db } from '@/db'
 import firebase from 'firebase/app'
-
-var woo = require('@/assets/gachi/WOO.mp3')
+import sounds from '@/sounds'
 
 export default {
   data () {
@@ -39,10 +49,14 @@ export default {
       userName: '',
       messages: [],
       inputMessage: '',
-      slaveName: ''
+      slaveName: this.$cookies.get('slaveName')
     }
   },
   methods: {
+    playMessageSound (index) {
+      var a = new Audio(sounds[index])
+      a.play()
+    },
     sendMessage () {
       if (this.inputMessage.length <= 0) return
       db.ref('messages').push({
@@ -55,13 +69,15 @@ export default {
     }
   },
   async created () {
-    db.ref('messages').once('value', initMessages => {
-      if (!initMessages.val()) return
-      const messages = initMessages.val()
-      this.messages = Object.keys(messages).map(k => {
-        return messages[k]
+    db
+      .ref('messages')
+      .once('value', initMessages => {
+        if (!initMessages.val()) return
+        const messages = initMessages.val()
+        this.messages = Object.keys(messages).map(k => {
+          return messages[k]
+        })
       })
-    })
 
     try {
       // Retrieve new posts as they are added to our database
@@ -70,22 +86,19 @@ export default {
         .orderByChild('createdAt')
         .startAt(Date.now())
         .on('child_added', (snapshot, prevChildKey) => {
-          var newPost = snapshot.val()
-          var a = new Audio(woo)
-          a.play()
-          this.messages.push(newPost)
+          const m = snapshot.val()
+          console.log(m)
+
+          if (m.from !== this.$cookies.get('slaveName')) {
+            switch (m.message.type) {
+              case 'audio':
+                var a = new Audio(sounds[m.message.key])
+                a.play()
+                break
+            }
+          }
+          this.messages.push(m)
         })
-
-      var slaveName = this.$cookies.get('slaveName')
-      if (!slaveName) {
-        const slaves = (await db.ref('slaves').once('value')).val()
-
-        slaveName = 'slave#' + slaves
-        this.$cookies.set('slaveName', slaveName)
-        db.ref('slaves').set(slaves + 1)
-      }
-
-      this.slaveName = slaveName
     } catch (error) {
       console.error(error)
     }
