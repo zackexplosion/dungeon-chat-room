@@ -1,7 +1,8 @@
 <template>
-  <div id="app">
+  <mu-container id="app">
+    <h1>Dunge♂n Chat Room</h1>
     <ChatBox />
-  </div>
+  </mu-container>
 </template>
 
 <script>
@@ -14,3 +15,13 @@ export default {
   }
 }
 </script>
+
+<style>
+h1 {
+  text-align: center;
+}
+#app{
+  position: relative;
+  background: #424242;
+}
+</style>
