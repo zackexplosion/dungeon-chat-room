@@ -12,7 +12,6 @@
           @click="playMessageSound(m.message.key)"
           >
             {{ m.message.key}}
-            <mu-icon value="check_circle" right></mu-icon>
           </mu-button>
         </template>
         <template v-else>
@@ -87,7 +86,6 @@ export default {
         .startAt(Date.now())
         .on('child_added', (snapshot, prevChildKey) => {
           const m = snapshot.val()
-          console.log(m)
 
           if (m.from !== this.$cookies.get('slaveName')) {
             switch (m.message.type) {
