@@ -1,6 +1,6 @@
 var sounds = {}
 var req = require.context('@/assets/gachi/')
-req.keys().forEach(function (key) {
+req.keys().forEach(function(key) {
   // console.log(key)
   var regexp = /\.\/(.*)\.mp3/
   var m = key.match(regexp)

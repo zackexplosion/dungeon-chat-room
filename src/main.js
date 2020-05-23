@@ -2,22 +2,29 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-import MuseUI from 'muse-ui'
-import theme from 'muse-ui/lib/theme'
-import 'muse-ui/dist/muse-ui.css'
 import { rtdbPlugin } from 'vuefire'
 import VueCookies from 'vue-cookies'
+import ElementUI from 'element-ui'
 
-theme.use('dark')
-
+import 'element-ui/lib/theme-chalk/index.css'
+import 'element-theme-dark'
 Vue.use(rtdbPlugin)
-Vue.use(MuseUI)
+
 Vue.use(VueCookies)
+Vue.use(ElementUI)
 
 // set default config
 Vue.$cookies.config('7d')
 
 Vue.config.productionTip = false
+
+import moment from 'moment'
+
+Vue.filter('formatDate', function(value) {
+  if (value) {
+    return moment(value).format('YYYY//MM/DD hh:mm:ss')
+  }
+})
 
 /* eslint-disable no-new */
 new Vue({

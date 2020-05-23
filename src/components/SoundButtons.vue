@@ -1,13 +1,13 @@
 <template>
-  <mu-container class="SoundsButtons">
-    <mu-button
+  <el-row class="SoundsButtons">
+    <el-button
       v-for="(b, index) in buttons"
       :key="index"
       small
       @click="send(b, index)"
     > {{ index }}
-    </mu-button>
-  </mu-container>
+    </el-button>
+  </el-row>
 </template>
 
 <script>
@@ -16,21 +16,19 @@ import firebase from 'firebase/app'
 import buttons from '@/sounds'
 
 export default {
-  data () {
+  data() {
     return {
       buttons
     }
   },
   methods: {
-    send (aduio, key) {
+    send(aduio, key) {
       new Audio(aduio).play()
 
       db.ref('messages').push({
         from: this.$cookies.get('slaveName'),
-        message: {
-          type: 'audio',
-          key: key
-        },
+        type: 'audio',
+        key: key,
         createdAt: firebase.database.ServerValue.TIMESTAMP
       })
     }
@@ -38,8 +36,8 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.SoundsButtons {
-  height: calc(80vh - 100px);
-  overflow: scroll;
-}
+// .SoundsButtons {
+//   height: calc(80vh - 100px);
+//   overflow: scroll;
+// }
 </style>

@@ -4,34 +4,44 @@
     <h4 v-if="reversedMessage.length <= 0">
       loading slaves
     </h4>
-    <ul id="messages">
-      <li v-for="(m, index) in reversedMessage" :key="index">
-        <template v-if="m.message.type == 'audio'">
-        {{ m.from }} :
-          <mu-button
-          @click="playMessageSound(m.message.key)"
-          >
-            {{ m.message.key}}
-          </mu-button>
-        </template>
-        <template v-else>
-          {{ m.from }} : {{ m.message }}
-        </template>
-      </li>
-    </ul>
+
+    <el-timeline>
+      <el-timeline-item
+        v-for="(m, index) in reversedMessage"
+        :key="index"
+        :timestamp="m.createdAt | formatDate"
+        placement="top">
+        <el-card>
+          <el-avatar icon="el-icon-user-solid"/>
+          <template v-if="m.type == 'audio'">
+            {{ m.from }} :
+            <el-button
+              icon="el-icon-caret-right"
+              type="info"
+              @click="playMessageSound(m.key)"
+            >
+              {{ m.key }}
+            </el-button>
+          </template>
+          <template v-else>
+            {{ m.from }} : {{ m.message }}
+          </template>
+        </el-card>
+      </el-timeline-item>
+    </el-timeline>
 
     <form
       class="inputbar"
       @submit.prevent="sendMessage"
     >
-      <mu-divider></mu-divider>
-      <span>{{ slaveName }}</span>
-      <mu-text-field
-        v-model="inputMessage"
+      <el-input
         ref="inputbox"
+        v-model="inputMessage"
         class="inputbox"
-      />
-      <mu-button @click="sendMessage">Send</mu-button>
+      >
+        <template slot="prepend">{{ slaveName }}</template>
+      </el-input>
+      <el-button @click="sendMessage">Send</el-button>
     </form>
   </div>
 </template>
@@ -42,32 +52,33 @@ import firebase from 'firebase/app'
 import sounds from '@/sounds'
 
 export default {
-  data () {
+  props: {
+    slaveName: {
+      type: String,
+      default: ''
+    }
+  },
+  data() {
     return {
       ready: false,
       userName: '',
       messages: [],
-      inputMessage: '',
-      slaveName: this.$cookies.get('slaveName')
+      inputMessage: ''
     }
   },
-  methods: {
-    playMessageSound (index) {
-      var a = new Audio(sounds[index])
-      a.play()
+  computed: {
+    reversedMessage() {
+      return this.messages.slice().reverse()
     },
-    sendMessage () {
-      if (this.inputMessage.length <= 0) return
-      db.ref('messages').push({
-        from: this.slaveName,
-        message: this.inputMessage,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      })
-
-      this.inputMessage = ''
+    lastMessage() {
+      if (this.messages.length > 0) {
+        return this.messages[this.messages.length - 1]
+      } else {
+        return false
+      }
     }
   },
-  async created () {
+  async created() {
     db
       .ref('messages')
       .once('value', initMessages => {
@@ -87,10 +98,10 @@ export default {
         .on('child_added', (snapshot, prevChildKey) => {
           const m = snapshot.val()
 
-          if (m.from !== this.$cookies.get('slaveName')) {
-            switch (m.message.type) {
+          if (m.from !== this.slaveName && m.type) {
+            switch (m.type) {
               case 'audio':
-                var a = new Audio(sounds[m.message.key])
+                var a = new Audio(sounds[m.key])
                 a.play()
                 break
             }
@@ -101,28 +112,33 @@ export default {
       console.error(error)
     }
   },
-  computed: {
-    reversedMessage () {
-      return this.messages.slice().reverse()
-    },
-    lastMessage () {
-      if (this.messages.length > 0) {
-        return this.messages[this.messages.length - 1]
-      } else {
-        return false
-      }
-    }
-  },
-  mounted () {
+  mounted() {
     this.$nextTick(() => {
+      this.focusInput()
+    })
+
+    setInterval(() => {
+      this.focusInput()
+    }, 200)
+  },
+  methods: {
+    focusInput() {
       var el = this.$refs.inputbox.$el
       el.querySelector('input').focus()
-    })
-  },
-  watch: {
-    messages (n, o) {
-      // console.log('messages change', n, o)
-
+    },
+    playMessageSound(index) {
+      var a = new Audio(sounds[index])
+      a.play()
+    },
+    sendMessage() {
+      if (this.inputMessage.length <= 0) return
+      db.ref('messages').push({
+        from: this.slaveName,
+        message: this.inputMessage,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      })
+      new Audio(sounds['WOO']).play()
+      this.inputMessage = ''
     }
   }
   // firebase: {
@@ -131,24 +147,20 @@ export default {
 }
 </script>
 <style>
-.mu-text-field-input {
+.el-text-field-input {
   color:#fff;
 }
 </style>
 <style lang="scss" scoped>
 
-// .container {
-//   height: calc(80vh -100px);
-
-// }
-
 .inputbox{
-  width: calc(100% - 160px);
+  width: calc(100% - 90px);
 }
 
-$inputBarHeight: 48;
+$inputBarHeight: 41;
 .inputbar {
-  padding-left: 15px;
+  padding:5px 0;
+  padding-left: 5px;
   width: 100%;
   position: fixed;
   bottom: 0;

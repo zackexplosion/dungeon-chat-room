@@ -6,7 +6,10 @@ const path = require('path')
 
 module.exports = {
   dev: {
-
+    externals: {
+      "vue": 'Vue',
+      "element-ui": "ElementUI"
+    },
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
