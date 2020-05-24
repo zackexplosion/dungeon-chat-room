@@ -102,7 +102,7 @@ export default {
   color:#fff;
 }
 .scroll-container {
-  height: 80vh;
+  height: 75vh;
   overflow:scroll;
   width: 100%;
 }
