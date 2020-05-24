@@ -40,4 +40,9 @@ h1 {
 .el-aside {
   height: 80vh;
 }
+
+.el-message-box {
+  width: auto !important;
+  max-width: 100% !important;
+}
 </style>
