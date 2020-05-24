@@ -107,6 +107,7 @@ export default {
   width: 100%;
 }
 .message {
+  margin-top: 1em;
   width: 100%;
 }
 

@@ -34,13 +34,10 @@ h1 {
 .el-aside {
   height: 90vh;
 }
-
-@media only screen and (max-width: 768px) {
-  .main {
-    padding: 0;
-  }
-  .el-aside {
-    height: 80vh;
-  }
+.main {
+  padding: 0;
+}
+.el-aside {
+  height: 80vh;
 }
 </style>
