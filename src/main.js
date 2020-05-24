@@ -29,18 +29,49 @@ Vue.filter('formatDate', function(value) {
 
 async function main() {
   // init slave name
-  var slaveName = Vue.$cookies.get('slaveName')
-  if (!slaveName) {
-    const slaves = (await db.ref('slaves').once('value')).val()
+  var slaveId = Vue.$cookies.get('slaveId')
+  var slave = {}
 
-    slaveName = 'slave#' + slaves
-    Vue.$cookies.set('slaveName', slaveName)
-    db.ref('slaves').set(slaves + 1)
+  console.log('slaveId', slaveId)
+  try {
+    if (!slaveId) {
+      const ref = db.ref('slaves').push()
+      Vue.$cookies.set('slaveId', ref.key)
+      slaveId = ref.key
+    }
+
+    var slaveRef = db.ref('slaves/' + slaveId)
+
+    slave = (await slaveRef.once('value')).val()
+
+    if (!slave) {
+      const slaves = await db.ref('slaves').once('value')
+      console.log('numChildren', slaves.numChildren())
+
+      slave = {
+        name: 'slave#' + (slaves.numChildren() + 1)
+      }
+      await slaveRef.set(slave)
+    }
+
+    slaveRef.set({
+      ...slave,
+      status: 'online'
+    })
+
+    slaveRef.onDisconnect().set({
+      ...slave,
+      status: 'offline'
+    })
+  } catch (error) {
+    console.error(error)
   }
-
+  console.log('salveID', slaveId)
+  console.log('slave', slave)
   const store = new Vuex.Store({
     state: {
-      slaveName
+      slave,
+      slaveName: slave.name
     }
   })
 
