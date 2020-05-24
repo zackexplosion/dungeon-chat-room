@@ -1,9 +1,10 @@
 <template>
-  <el-row class="SoundsButtons">
+  <el-row class="soundsButtons">
     <el-button
       v-for="(b, index) in buttons"
       :key="index"
       small
+      class="buttons"
       @click="send(b, index)"
     > {{ index }}
     </el-button>
@@ -35,3 +36,11 @@ export default {
   }
 }
 </script>
+<style  scoped>
+/* .soundsButtons {
+  padding-top: 79px;
+} */
+.buttons {
+  margin-left: 10px;
+}
+</style>

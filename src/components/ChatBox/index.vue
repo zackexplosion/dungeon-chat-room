@@ -1,39 +1,40 @@
 <template>
-  <div class="container">
+  <el-container>
 
     <h4 v-if="messages.length <= 0">
       loading slaves
     </h4>
 
-    <ul
-      v-chat-scroll>
-      <li
+    <div
+      v-chat-scroll
+      class="scroll-container"
+    >
+      <el-card
         v-for="(m, index) in messages"
         :key="index"
         :timestamp="m.createdAt | formatDate"
+        class="message"
         placement="top"
       >
-        <el-card>
-          <el-avatar icon="el-icon-user-solid"/>
-          <template v-if="m.type == 'audio'">
-            {{ m.from }} :
-            <el-button
-              icon="el-icon-caret-right"
-              type="info"
-              @click="playMessageSound(m.key)"
-            >
-              {{ m.key }}
-            </el-button>
-          </template>
-          <template v-else>
-            {{ m.from }} : {{ m.message }}
-          </template>
-        </el-card>
-      </li>
-    </ul>
+        <!-- <el-avatar icon="el-icon-user-solid"/> -->
+        <template v-if="m.type == 'audio'">
+          {{ m.from }} :
+          <el-button
+            icon="el-icon-caret-right"
+            type="info"
+            @click="playMessageSound(m.key)"
+          >
+            {{ m.key }}
+          </el-button>
+        </template>
+        <template v-else>
+          {{ m.from }} : {{ m.message }}
+        </template>
+      </el-card>
+    </div>
 
     <MessageInput />
-  </div>
+  </el-container>
 </template>
 
 <script>
@@ -98,4 +99,13 @@ export default {
 .el-text-field-input {
   color:#fff;
 }
+.scroll-container {
+  height: 80vh;
+  overflow:scroll;
+  width: 100%;
+}
+.message {
+  width: 100%;
+}
+
 </style>

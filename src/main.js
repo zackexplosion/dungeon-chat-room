@@ -1,5 +1,3 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
 import { rtdbPlugin } from 'vuefire'
@@ -46,11 +44,9 @@ async function main() {
     }
   })
 
-  /* eslint-disable no-new */
   new Vue({
     el: '#app',
     store,
-    // setup the reactive todos property
     components: { App },
     template: '<App/>'
   })

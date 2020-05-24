@@ -1,5 +1,5 @@
 <template>
-  <el-container id="app" style="height: 90vh">
+  <el-container>
     <el-container>
       <el-header>
         <h1>Dunge♂n Chat Room</h1>
@@ -8,7 +8,7 @@
         <ChatBox />
       </el-main>
     </el-container>
-    <el-aside width="200px">
+    <el-aside width="150px">
       <SoundButtons/>
     </el-aside>
   </el-container>
@@ -30,5 +30,11 @@ export default {
 <style>
 h1 {
   text-align: center;
+}
+.el-aside {
+  height: 90vh;
+}
+.el-main {
+  padding: 0;
 }
 </style>
