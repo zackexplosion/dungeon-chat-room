@@ -25,9 +25,12 @@ export default {
   methods: {
     send(aduio, key) {
       new Audio(aduio).play()
-      const { slaveName } = this.$store.state
+      const { slave } = this.$store.state
       db.ref('messages').push({
-        from: slaveName,
+        from: {
+          id: slave.id,
+          name: slave.name
+        },
         type: 'audio',
         key: key,
         createdAt: firebase.database.ServerValue.TIMESTAMP

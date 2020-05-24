@@ -31,8 +31,7 @@ async function main() {
   // init slave name
   var slaveId = Vue.$cookies.get('slaveId')
   var slave = {}
-
-  console.log('slaveId', slaveId)
+  var slaveRef
   try {
     if (!slaveId) {
       const ref = db.ref('slaves').push()
@@ -40,7 +39,7 @@ async function main() {
       slaveId = ref.key
     }
 
-    var slaveRef = db.ref('slaves/' + slaveId)
+    slaveRef = db.ref('slaves/' + slaveId)
 
     slave = (await slaveRef.once('value')).val()
 
@@ -49,7 +48,8 @@ async function main() {
       console.log('numChildren', slaves.numChildren())
 
       slave = {
-        name: 'slave#' + (slaves.numChildren() + 1)
+        id: slaveId,
+        name: 'slave#' + slaves.numChildren()
       }
       await slaveRef.set(slave)
     }
@@ -66,12 +66,22 @@ async function main() {
   } catch (error) {
     console.error(error)
   }
-  console.log('salveID', slaveId)
-  console.log('slave', slave)
+
   const store = new Vuex.Store({
     state: {
-      slave,
-      slaveName: slave.name
+      slave
+    },
+    mutations: {
+      changeSlaveName(state, payload) {
+        const { name } = slave
+        const id = name.split('#')[1]
+        const newName = payload + '#' + id
+        slaveRef.set({
+          ...slave,
+          name: newName
+        })
+        state.slave.name = newName
+      }
     }
   })
 

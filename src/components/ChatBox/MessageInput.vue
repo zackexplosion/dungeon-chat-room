@@ -8,7 +8,12 @@
       v-model="inputMessage"
       class="inputbox"
     >
-      <template slot="prepend">{{ slaveName }}</template>
+      <template slot="prepend" >
+        <span
+          @click="openChangeSlaveNamePrompt">
+          {{ slave.name }}
+        </span>
+      </template>
     </el-input>
     <el-button @click="sendMessage">Send</el-button>
   </form>
@@ -21,9 +26,10 @@ import sounds from '@/sounds'
 
 export default {
   data() {
-    const { slaveName } = this.$store.state
+    const { slaveName, slave } = this.$store.state
     return {
       slaveName,
+      slave,
       inputMessage: ''
     }
   },
@@ -32,9 +38,9 @@ export default {
       this.focusInput()
     })
 
-    setInterval(() => {
-      this.focusInput()
-    }, 500)
+    // setInterval(() => {
+    //   this.focusInput()
+    // }, 500)
   },
   methods: {
     focusInput() {
@@ -44,12 +50,33 @@ export default {
     sendMessage() {
       if (this.inputMessage.length <= 0) return
       db.ref('messages').push({
-        from: this.slaveName,
+        from: {
+          id: this.slave.id,
+          name: this.slave.name
+        },
         message: this.inputMessage,
         createdAt: firebase.database.ServerValue.TIMESTAMP
       })
       new Audio(sounds['WOO']).play()
       this.inputMessage = ''
+    },
+    openChangeSlaveNamePrompt() {
+      this.$prompt('Enter New Slave Name', 'Woo', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        inputValue: this.slave.name.split('#')[0]
+      }).then(({ value }) => {
+        this.$store.commit('changeSlaveName', value)
+        this.$message({
+          type: 'success',
+          message: 'Your new slave name is:' + value
+        })
+      }).catch((e) => {
+        this.$message({
+          type: 'info',
+          message: 'Input canceled'
+        })
+      })
     }
   }
 }

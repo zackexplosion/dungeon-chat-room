@@ -18,7 +18,7 @@
       >
         <!-- <el-avatar icon="el-icon-user-solid"/> -->
         <template v-if="m.type == 'audio'">
-          {{ m.from }} :
+          {{ m.from.name }} :
           <el-button
             icon="el-icon-caret-right"
             type="info"
@@ -28,7 +28,7 @@
           </el-button>
         </template>
         <template v-else>
-          {{ m.from }} : {{ m.message }}
+          {{ m.from.name }} : {{ m.message }}
         </template>
       </el-card>
     </div>
@@ -47,7 +47,9 @@ export default {
     MessageInput
   },
   data() {
+    const { slave } = this.$store.state
     return {
+      slave,
       messages: []
     }
   },
@@ -75,7 +77,7 @@ export default {
         .on('child_added', (snapshot, prevChildKey) => {
           const m = snapshot.val()
 
-          if (m.from !== this.slaveName && m.type) {
+          if (m.from.id !== this.slave.id && m.type) {
             switch (m.type) {
               case 'audio':
                 this.playMessageSound(m.key)
