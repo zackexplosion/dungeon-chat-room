@@ -24,9 +24,9 @@ export default {
   methods: {
     send(aduio, key) {
       new Audio(aduio).play()
-
+      const { slaveName } = this.$store.state
       db.ref('messages').push({
-        from: this.$cookies.get('slaveName'),
+        from: slaveName,
         type: 'audio',
         key: key,
         createdAt: firebase.database.ServerValue.TIMESTAMP
@@ -35,9 +35,3 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-// .SoundsButtons {
-//   height: calc(80vh - 100px);
-//   overflow: scroll;
-// }
-</style>

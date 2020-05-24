@@ -5,12 +5,14 @@
       loading slaves
     </h4>
 
-    <el-timeline>
-      <el-timeline-item
-        v-for="(m, index) in reversedMessage"
+    <ul
+      v-chat-scroll>
+      <li
+        v-for="(m, index) in messages"
         :key="index"
         :timestamp="m.createdAt | formatDate"
-        placement="top">
+        placement="top"
+      >
         <el-card>
           <el-avatar icon="el-icon-user-solid"/>
           <template v-if="m.type == 'audio'">
@@ -27,8 +29,8 @@
             {{ m.from }} : {{ m.message }}
           </template>
         </el-card>
-      </el-timeline-item>
-    </el-timeline>
+      </li>
+    </ul>
 
     <form
       class="inputbar"
@@ -52,14 +54,10 @@ import firebase from 'firebase/app'
 import sounds from '@/sounds'
 
 export default {
-  props: {
-    slaveName: {
-      type: String,
-      default: ''
-    }
-  },
   data() {
+    const { slaveName } = this.$store.state
     return {
+      slaveName,
       ready: false,
       userName: '',
       messages: [],
@@ -81,6 +79,7 @@ export default {
   async created() {
     db
       .ref('messages')
+      .limitToLast(10)
       .once('value', initMessages => {
         if (!initMessages.val()) return
         const messages = initMessages.val()
