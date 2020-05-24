@@ -4,7 +4,7 @@
       <el-header>
         <h1>Dunge♂n Chat Room</h1>
       </el-header>
-      <el-main>
+      <el-main class="main">
         <ChatBox />
       </el-main>
     </el-container>
@@ -34,7 +34,13 @@ h1 {
 .el-aside {
   height: 90vh;
 }
-.el-main {
-  padding: 0;
+
+@media only screen and (max-width: 768px) {
+  .main {
+    padding: 0;
+  }
+  .el-aside {
+    height: 80vh;
+  }
 }
 </style>
