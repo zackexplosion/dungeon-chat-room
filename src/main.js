@@ -111,6 +111,11 @@ async function main() {
     components: { App },
     template: '<App/>'
   })
+
+  var loader = document.querySelector('.loader')
+  if (loader) {
+    loader.remove()
+  }
 }
 
 main()
