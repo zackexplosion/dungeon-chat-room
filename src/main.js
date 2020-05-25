@@ -6,6 +6,7 @@ import ElementUI from 'element-ui'
 import VueChatScroll from 'vue-chat-scroll'
 import moment from 'moment'
 import Vuex from 'vuex'
+import firebase from 'firebase/app'
 import { db } from '@/db'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'element-theme-dark'
@@ -32,6 +33,7 @@ async function main() {
   var slaveId = Vue.$cookies.get('slaveId')
   var slave = {}
   var slaveRef
+  console.log('slaveId', slaveId)
   try {
     if (!slaveId) {
       const ref = db.ref('slaves').push()
@@ -43,7 +45,7 @@ async function main() {
 
     slave = (await slaveRef.once('value')).val()
 
-    if (!slave) {
+    if (!slave || !slave.name) {
       const slaves = await db.ref('slaves').once('value')
       console.log('numChildren', slaves.numChildren())
 
@@ -51,18 +53,20 @@ async function main() {
         id: slaveId,
         name: 'slave#' + slaves.numChildren()
       }
-      await slaveRef.set(slave)
     }
 
-    slaveRef.set({
-      ...slave,
-      status: 'online'
-    })
+    slave.status = 'online'
+    slave.lastChange = firebase.database.ServerValue.TIMESTAMP
+
+    slaveRef.set(slave)
 
     slaveRef.onDisconnect().set({
       ...slave,
-      status: 'offline'
+      status: 'offline',
+      lastChange: firebase.database.ServerValue.TIMESTAMP
     })
+
+    console.log('slave', slave)
   } catch (error) {
     console.error(error)
   }
@@ -73,13 +77,29 @@ async function main() {
     },
     mutations: {
       changeSlaveName(state, payload) {
-        const { name } = slave
-        const id = name.split('#')[1]
+        // const { name } = slave
+        console.log('slave', slave)
+        const id = slave.name.split('#')[1]
         const newName = payload + '#' + id
-        slaveRef.set({
+        // clean disconnect action
+        slaveRef.onDisconnect().cancel()
+
+        // upadate database
+        slave = {
           ...slave,
-          name: newName
+          name: newName,
+          status: 'online',
+          lastChange: firebase.database.ServerValue.TIMESTAMP
+        }
+        slaveRef.set(slave)
+
+        // register a new disconnect action
+        slaveRef.onDisconnect().set({
+          ...slave,
+          status: 'offline',
+          lastChange: firebase.database.ServerValue.TIMESTAMP
         })
+
         state.slave.name = newName
       }
     }
